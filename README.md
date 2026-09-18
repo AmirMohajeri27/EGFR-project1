@@ -57,6 +57,16 @@ I created a `find_pocket()` function that:
 
 I used the function to compare residues near erlotinib and gefitinib.
 
+### Important limitation of the first comparison
+
+At first, the analysis compared the residue numbers directly and found only a small number of shared pocket residues between erlotinib and gefitinib.
+
+However, this result is not biologically realistic. Erlotinib and gefitinib are both known to bind the same main region of EGFR: the ATP-binding pocket. Therefore, their nearby protein residues should overlap substantially.
+
+We found that the problem comes from the raw PDB files. The two structures do not label EGFR residues in exactly the same way: one structure starts and numbers the kinase-domain residues differently from the other. This means that two numbers that look different can still refer to the same position in the EGFR protein.
+
+For this reason, the first raw-number comparison cannot yet be used to conclude that the two drugs bind different pockets. The next step is to align the protein structures and convert residues to one shared EGFR numbering system before comparing them again.
+
 
 ## Repository structure
 
