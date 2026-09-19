@@ -66,6 +66,32 @@ However, this result is not biologically realistic. Erlotinib and gefitinib are 
 We found that the problem comes from the raw PDB files. The two structures do not label EGFR residues in exactly the same way: one structure starts and numbers the kinase-domain residues differently from the other. This means that two numbers that look different can still refer to the same position in the EGFR protein.
 
 For this reason, the first raw-number comparison cannot yet be used to conclude that the two drugs bind different pockets. The next step is to align the protein structures and convert residues to one shared EGFR numbering system before comparing them again.
+### 7. Fixed the numbering mismatch using sequence alignment
+
+Rather than assuming what the numbering difference was, I confirmed it directly:
+
+- Extracted the amino acid sequence of each structure's protein chain
+- Aligned the two sequences using Biopython's `PairwiseAligner`
+- The alignment showed the two structures are almost identical in sequence (one small gap where a loop wasn't resolved in one structure), confirming they represent the same region of EGFR — just numbered differently by each depositor
+- Built a residue-to-residue mapping from the alignment, translating erlotinib's pocket residue numbers into gefitinib's numbering system
+
+### Resolving the numbering mismatch
+
+An initial direct comparison of residue numbers found only 2 shared pocket residues between erlotinib and gefitinib — biologically implausible, since both drugs are known ATP-competitive inhibitors expected to occupy the same pocket.
+
+Investigation showed the two PDB structures label EGFR residues differently: the same physical residue can have a different number in each file. A raw-number comparison was therefore not meaningful.
+
+This was resolved by aligning the two structures' protein sequences and using the alignment to build a mapping between their residue numbering systems (see Section 7). Comparing pocket residues through this mapping, instead of by raw number, gives a result consistent with known EGFR biology (see Results below).
+
+## Results
+
+After correcting for the residue numbering mismatch:
+
+- **20 residues** form the shared binding pocket for both erlotinib and gefitinib: 718, 719, 726, 743, 745, 762, 766, 788–797, 844, 854, 855
+- **0 residues** are unique to erlotinib's pocket — it is fully contained within gefitinib's
+- **3 residues** (720, 744, 800) are unique to gefitinib's pocket
+
+This large overlap is consistent with both drugs being ATP-competitive EGFR inhibitors that bind the same site. The shared residues include Thr790 and Cys797 — two of the most clinically significant positions in EGFR, associated with drug-resistance mutations (T790M and C797S) seen in lung cancer patients treated with these inhibitors.
 
 
 ## Repository structure
@@ -83,8 +109,7 @@ EGFR-project1/
 
 ## Tools used
 - Python
-- Biopython
+- Biopython (`Bio.PDB`, `Bio.Align`, `Bio.SeqUtils`)
 - Jupyter Notebook
 - py3Dmol
 - Protein Data Bank (PDB)
-
